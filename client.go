@@ -1,6 +1,9 @@
 package go_http_client
 
-import "net/http"
+import (
+	"github.com/pkg/errors"
+	"net/http"
+)
 
 // set a custom UA
 const UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) " +
@@ -41,9 +44,13 @@ func NewMethod(url, method string) (*Client, error) {
 	return client, err
 }
 
-// Do dispatches the Request with the Client
+// Do dispatches the Request with the Client and checks if it returned status 200
 func (c *Client) Do() (resp *http.Response, err error) {
-	return c.Client.Do(c.Request)
+	resp, err = c.Client.Do(c.Request)
+	if resp.StatusCode < 200 || resp.StatusCode > 201 {
+		return resp, errors.New("Did not receive status 200")
+	}
+	return resp, err
 }
 
 // SetBasicAuth sets a username and a password to the Request object
