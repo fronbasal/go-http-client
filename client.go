@@ -15,20 +15,30 @@ type Client struct {
 }
 
 // New creates a new HTTP Client with a Client and a Request
-func New(url string) (Client, error) {
+func New(url string) (*Client, error) {
 	// Create an empty HTTP Client
 	c := &http.Client{}
 	// Create a new http.Request
 	r, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return Client{}, err
+		return &Client{}, err
 	}
 	// Set a custom UA
 	r.Header.Set("User-Agent", UserAgent)
 	// Allow GZIP
 	r.Header.Set("Accept-Encoding", "gzip")
 
-	return Client{Client: c, Request: r}, nil
+	return &Client{Client: c, Request: r}, nil
+}
+
+// NewMethod creates a new HTTP Client with a specified HTTP Method
+func NewMethod(url, method string) (*Client, error) {
+	client, err := New(url)
+	if err != nil {
+		return &Client{}, nil
+	}
+	client.Request.Method = method
+	return client, err
 }
 
 // Do dispatches the Request with the Client
